@@ -1,11 +1,11 @@
 const express = require('express');
 const authController = require('../controllers/authController');
-const workerController = require('../controllers/workerController');
+const customerController = require('../controllers/customerController');
 
 const router = express.Router();
+// Auth stuff
 router.route('/signup').post(authController.signup);
 
-router.route('/').get(workerController.getAllWorkers);
 
-// after loggin in stuff (workers are tours)
 module.exports = router;
+// api/v2/user/login

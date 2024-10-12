@@ -16,14 +16,14 @@ const reviewSchema = new mongoose.Schema(
       type: Date,
       default: Date.now,
     },
-    user: {
+    customer: {
       type: mongoose.Schema.ObjectId,
-      ref: 'User',
-      required: [true, 'Review must belong to a user.'],
+      ref: 'Customer',
+      required: [true, 'Review must belong to a customer.'],
     },
     worker: {
       type: mongoose.Schema.ObjectId,
-      ref: 'User',
+      ref: 'Worker',
       required: [true, 'Review must belong to a worker.'],
     },
   },
