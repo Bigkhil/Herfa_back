@@ -96,14 +96,14 @@ customerSchema.methods.changedPasswordAfter = function (JWTTimeStamp) {
 
 customerSchema.methods.createPasswordResetToken = function () {
   const resetToken = crypto.randomBytes(32).toString('hex');
-  this.PasswordResetToken = crypto
+  this.passwordResetToken = crypto
     .createHash('sha256')
     .update(resetToken)
     .digest('hex');
 
-  console.log({ resetToken }, this.PasswordResetToken);
+  console.log({ resetToken }, this.passwordResetToken);
 
-  this.PasswordResetExpires = Date.now() + 10 * 60 * 1000;
+  this.passwordResetExpires = Date.now() + 10 * 60 * 1000;
   return resetToken;
 };
 
