@@ -11,6 +11,7 @@ const globalErrorhandler = require('./controllers/errorController');
 const customerRouter = require('./routes/customerRoutes');
 const workerRouter = require('./routes/workerRoutes');
 const authRouter = require('./routes/authRoutes');
+const reviewRouter = require('./routes/reviewRoutes');
 
 const app = express();
 
@@ -66,7 +67,8 @@ app.use((req, res, next) => {
 //3) Routes
 app.use('/api/v1/customers', customerRouter);
 app.use('/api/v1/workers', workerRouter);
-app.use('/api/v1', authRouter);
+app.use('/api/v1/auth', authRouter);
+app.use('/api/v1/reviews', reviewRouter);
 
 app.all('*', (req, res, next) => {
   // res.status(404).json({

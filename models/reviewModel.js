@@ -1,6 +1,5 @@
 const mongoose = require('mongoose');
 
-
 const reviewSchema = new mongoose.Schema(
   {
     review: {
@@ -32,6 +31,8 @@ const reviewSchema = new mongoose.Schema(
     toObject: { virtuals: true },
   },
 );
+
+reviewSchema.index({ worker: 1, customer: 1 }, { unique: true });
 
 const Review = mongoose.model('Review', reviewSchema);
 

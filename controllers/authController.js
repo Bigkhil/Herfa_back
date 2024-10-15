@@ -58,8 +58,18 @@ exports.signup = catchAsync(async (req, res, next) => {
   const existingWorker = await Worker.findOne({ email });
   const existingCustomer = await Customer.findOne({ email });
 
+  // Check if the phone number exists in both collections
+  const existingWorkerPhone = await Worker.findOne({ phoneNumber });
+  const existingCustomerPhone = await Customer.findOne({ phoneNumber });
+
   if (existingWorker || existingCustomer) {
     return next(new AppError('Email is already in use by another user.', 400));
+  }
+
+  if (existingWorkerPhone || existingCustomerPhone) {
+    return next(
+      new AppError('Phone number is already in use by another user.', 400),
+    );
   }
 
   let newUser;
@@ -154,7 +164,7 @@ exports.protect = catchAsync(async (req, res, next) => {
       new AppError('User recently changed password! Please log in again.', 401),
     );
   }
-
+  console.log(currentUser);
   // Grant access to protected route
   req.user = currentUser;
   next();

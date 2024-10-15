@@ -4,84 +4,97 @@ const validator = require('validator');
 const bcrypt = require('bcryptjs');
 const AppError = require('../utils/appError');
 
-const workerSchema = new mongoose.Schema({
-  name: {
-    type: String,
-    required: [true, 'Please tell us your name'],
-  },
-  email: {
-    type: String,
-    required: [true, 'Please provide your email'],
-    unique: true,
-    lowercase: true,
-    validate: [validator.isEmail, 'Please provide a valid email'],
-  },
-  role: {
-    type: String,
-    enum: ['customer', 'worker', 'admin'], // Added 'admin' here
-    default: 'worker', // Default role for workers
-  },
-  phoneNumber: {
-    type: String,
-    required: true,
-    unique: true,
-  },
-  city: {
-    type: String,
-    required: true,
-  },
-  skill: {
-    type: String,
-    required: true,
-  },
-  yearsOfExperience: {
-    type: Number,
-    required: true,
-  },
-  hourlyRate: {
-    type: Number,
-    required: true,
-  },
-  bio: {
-    type: String,
-    required: true,
-  },
-  ratingsAverage: {
-    type: Number,
-    default: 4.5,
-    min: [1, 'Rating must be above 1.0'],
-    max: [5, 'Rating must be below 5.0'],
-    set: (val) => Math.round(val * 10) / 10, //4.666667 > 46.6666 > 47 > 4.7
-  },
-  ratingsQuantity: {
-    type: Number,
-    default: 0,
-  },
-  password: {
-    type: String,
-    required: [true, 'Please provide a password'],
-    minlength: 8,
-    select: false,
-  },
-  passwordConfirm: {
-    type: String,
-    required: [true, 'Please confirm your password'],
-    validate: {
-      //This only works only on SAVE and CREATE !!
-      validator: function (el) {
-        return el === this.password;
+const workerSchema = new mongoose.Schema(
+  {
+    name: {
+      type: String,
+      required: [true, 'Please tell us your name'],
+    },
+    email: {
+      type: String,
+      required: [true, 'Please provide your email'],
+      unique: true,
+      lowercase: true,
+      validate: [validator.isEmail, 'Please provide a valid email'],
+    },
+    role: {
+      type: String,
+      enum: ['customer', 'worker', 'admin'], // Added 'admin' here
+      default: 'worker', // Default role for workers
+    },
+    phoneNumber: {
+      type: String,
+      required: true,
+      unique: true,
+    },
+    city: {
+      type: String,
+      required: true,
+    },
+    skill: {
+      type: String,
+      required: true,
+    },
+    yearsOfExperience: {
+      type: Number,
+      required: true,
+    },
+    hourlyRate: {
+      type: Number,
+      required: true,
+    },
+    bio: {
+      type: String,
+      required: true,
+    },
+    ratingsAverage: {
+      type: Number,
+      default: 4.5,
+      min: [1, 'Rating must be above 1.0'],
+      max: [5, 'Rating must be below 5.0'],
+      set: (val) => Math.round(val * 10) / 10, //4.666667 > 46.6666 > 47 > 4.7
+    },
+    ratingsQuantity: {
+      type: Number,
+      default: 0,
+    },
+    password: {
+      type: String,
+      required: [true, 'Please provide a password'],
+      minlength: 8,
+      select: false,
+    },
+    passwordConfirm: {
+      type: String,
+      required: [true, 'Please confirm your password'],
+      validate: {
+        //This only works only on SAVE and CREATE !!
+        validator: function (el) {
+          return el === this.password;
+        },
+        message: 'Passwords are not the same',
       },
-      message: 'Passwords are not the same',
+    },
+    passwordChangedAt: Date,
+    passwordResetToken: String,
+    passwordResetExpires: Date,
+    active: {
+      type: Boolean,
+      default: true,
+      select: false,
     },
   },
-  passwordChangedAt: Date,
-  passwordResetToken: String,
-  passwordResetExpires: Date,
-  active: {
-    type: Boolean,
-    default: true,
-    select: false,
+  {
+    toJSON: { virtuals: true },
+    toObject: { virtuals: true },
   },
+);
+
+//Virtual population
+workerSchema.virtual('reviews', {
+  ref: 'Review',
+  foreignField: 'worker',
+  localField: '_id',
 });
 
 workerSchema.pre('save', async function (next) {
