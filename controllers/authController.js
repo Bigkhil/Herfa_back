@@ -262,3 +262,16 @@ exports.resetPassword = catchAsync(async (req, res, next) => {
   // 4) Log the user in, send JWT
   createSendToken(user, 200, res);
 });
+
+exports.getMe = (req, res, next) => {
+  // Check if the user is a worker or a customer
+  if (req.user.role === 'worker') {
+    // If the user is a worker, fetch their worker profile
+    req.params.workerId = req.user.id;
+  } else if (req.user.role === 'customer') {
+    // If the user is a customer, fetch their customer profile
+    req.params.customerId = req.user.id;
+  }
+  // Continue to the next middleware or controller
+  next();
+};

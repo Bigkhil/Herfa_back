@@ -53,34 +53,58 @@ exports.getReview = catchAsync(async (req, res, next) => {
 });
 
 exports.deleteReview = catchAsync(async (req, res, next) => {
-  const review = await Review.findByIdAndDelete(req.params.id);
+  // Find the review first to check ownership
+  const review = await Review.findById(req.params.id);
 
   if (!review) {
-    return next(new AppError('No review found with that ID.', 404));
+    return next(new AppError('No review found with that ID', 404));
   }
 
-  res.status(200).json({
+  // Check if the current user is the owner of the review
+  if (review.customer.toString() !== req.user.id) {
+    return next(
+      new AppError('You do not have permission to delete this review', 403),
+    );
+  }
+
+  // Proceed with deletion if ownership is validated
+  await Review.findByIdAndDelete(req.params.id);
+
+  res.status(204).json({
     status: 'success',
-    data: {
-      data: null,
-    },
+    data: null,
   });
 });
 
 exports.updateReview = catchAsync(async (req, res, next) => {
-  const review = await Review.findByIdAndUpdate(req.params.id, req.body, {
-    new: true,
-    runValidators: true,
-  });
+  // Find the review first to check ownership
+  const review = await Review.findById(req.params.id);
 
   if (!review) {
-    return next(new AppError('no review found with that ID', 404));
+    return next(new AppError('No review found with that ID', 404));
   }
+
+  // Check if the current user is the owner of the review
+  if (review.customer.toString() !== req.user.id) {
+    return next(
+      new AppError('You do not have permission to update this review', 403),
+    );
+  }
+
+  // Proceed with the update if ownership is validated
+  const updatedReview = await Review.findByIdAndUpdate(
+    req.params.id,
+    req.body,
+    {
+      new: true,
+      runValidators: true,
+    },
+  );
 
   res.status(200).json({
     status: 'success',
     data: {
-      data: review,
+      data: updatedReview,
     },
   });
 });
