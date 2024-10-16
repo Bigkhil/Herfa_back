@@ -15,7 +15,7 @@ exports.getAllReviews = catchAsync(async (req, res, next) => {
   if (req.params.workerId) filter = { worker: req.params.workerId };
   console.log(filter);
 
-  const reviews = await Review.find(filter);
+  const reviews = await Review.find(filter).populate('customer', 'name city');
 
   res.status(200).json({
     status: 'success',
@@ -38,10 +38,15 @@ exports.createReview = catchAsync(async (req, res, next) => {
 });
 
 exports.getReview = catchAsync(async (req, res, next) => {
-  const review = await Review.findById(req.params.id);
+  const filter = { worker: req.params.workerId, _id: req.params.id };
+
+  // Use findOne to search by worker ID and review ID
+  const review = await Review.findOne(filter).populate('customer', 'name city');
 
   if (!review) {
-    return next(new AppError('No review found with that ID.', 404));
+    return next(
+      new AppError('No review found with that ID for this worker.', 404),
+    );
   }
 
   res.status(200).json({
@@ -53,11 +58,23 @@ exports.getReview = catchAsync(async (req, res, next) => {
 });
 
 exports.deleteReview = catchAsync(async (req, res, next) => {
-  // Find the review first to check ownership
-  const review = await Review.findById(req.params.id);
+  // Check if workerId is provided in the request
+  if (!req.params.workerId) {
+    return next(
+      new AppError('Worker ID is required to delete the review.', 400),
+    );
+  }
+
+  // Find the review based on workerId and reviewId
+  const review = await Review.findOne({
+    worker: req.params.workerId,
+    _id: req.params.id,
+  });
 
   if (!review) {
-    return next(new AppError('No review found with that ID', 404));
+    return next(
+      new AppError('No review found with that ID for this worker', 404),
+    );
   }
 
   // Check if the current user is the owner of the review
@@ -77,11 +94,23 @@ exports.deleteReview = catchAsync(async (req, res, next) => {
 });
 
 exports.updateReview = catchAsync(async (req, res, next) => {
-  // Find the review first to check ownership
-  const review = await Review.findById(req.params.id);
+  // Check if workerId is provided in the request
+  if (!req.params.workerId) {
+    return next(
+      new AppError('Worker ID is required to update the review.', 400),
+    );
+  }
+
+  // Find the review based on workerId and reviewId
+  const review = await Review.findOne({
+    worker: req.params.workerId,
+    _id: req.params.id,
+  });
 
   if (!review) {
-    return next(new AppError('No review found with that ID', 404));
+    return next(
+      new AppError('No review found with that ID for this worker', 404),
+    );
   }
 
   // Check if the current user is the owner of the review

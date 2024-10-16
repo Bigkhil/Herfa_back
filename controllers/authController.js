@@ -7,6 +7,16 @@ const catchAsync = require('./../utils/catchAsync');
 const AppError = require('./../utils/appError');
 const sendEmail = require('./../utils/email');
 
+const filterObj = (obj, ...allowedFields) => {
+  const newObj = {};
+  Object.keys(obj).forEach((el) => {
+    if (allowedFields.includes(el)) {
+      newObj[el] = obj[el];
+    }
+  });
+  return newObj;
+};
+
 const signToken = (id) => {
   return jwt.sign({ id }, process.env.JWT_SECRET, {
     expiresIn: process.env.JWT_EXPIRES_IN,
@@ -275,3 +285,62 @@ exports.getMe = (req, res, next) => {
   // Continue to the next middleware or controller
   next();
 };
+
+/// Get worker Profile
+exports.getWorkerMe = catchAsync(async (req, res, next) => {
+  const worker = await Worker.findById(req.user.id); // Using req.user.id from the getMe middleware
+
+  if (!worker) {
+    return next(new AppError('No worker found with that ID', 404));
+  }
+
+  res.status(200).json({
+    status: 'success',
+    data: {
+      data: worker,
+    },
+  });
+});
+
+// Get Customer Profile
+exports.getCustomerMe = catchAsync(async (req, res, next) => {
+  const customer = await Customer.findById(req.user.id); // Using req.user.id from the getMe middleware
+
+  if (!customer) {
+    return next(new AppError('No customer found with that ID', 404));
+  }
+
+  res.status(200).json({
+    status: 'success',
+    data: {
+      data: customer,
+    },
+  });
+});
+
+exports.updateMe = catchAsync(async (req, res, next) => {
+  // 1) Create error if user POSTs passwords data
+  if (req.body.password || req.body.passwordConfirm) {
+    return next(
+      new AppError(
+        'This route is not for password updates. Please use /updateMypassword',
+        400,
+      ),
+    );
+  }
+  // 2) Filter out unwanted fields names that are not allowed
+  const filteredBody = filterObj(req.body, 'name', 'email');
+
+  // 3) Update user document
+  const updatedUser = await User.findByIdAndUpdate(req.user.id, filteredBody, {
+    new: true,
+    runValidators: true,
+  });
+
+  res.status(200).json({
+    status: 'success',
+    data: {
+      user: updatedUser,
+    },
+  });
+});

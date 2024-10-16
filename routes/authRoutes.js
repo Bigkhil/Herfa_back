@@ -9,5 +9,18 @@ router.post('/forgotPassword', authController.forgotPassword);
 router.patch('/resetPassword/:token', authController.resetPassword);
 
 // Profile Stuff
-module.exports = router;
+// Protecting Routes
+router.use(authController.protect);
 
+router.get('/me', authController.getMe, (req, res, next) => {
+  if (req.user.role === 'worker') {
+    return authController.getWorkerMe(req, res, next);
+  } else if (req.user.role === 'customer') {
+    return authController.getCustomerMe(req, res, next);
+  }
+});
+router.patch('/updateMe', authController.updateMe);
+// router.delete('/deleteMe', userController.deleteMe);
+// router.patch('/updateMyPassword', authController.updatePassword);
+
+module.exports = router;

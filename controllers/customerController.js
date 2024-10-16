@@ -55,3 +55,4 @@ exports.deleteCustomer = catchAsync(async (req, res, next) => {
     },
   });
 });
+// {{url}}api/v1/workers/670dfd81ab2ae955b71d0c05/reviews/670df42735efac34eaeedaea
