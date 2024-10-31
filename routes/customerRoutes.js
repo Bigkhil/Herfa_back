@@ -8,7 +8,11 @@ router.route('/signup').post(authController.signup);
 
 router
   .route('/')
-  .get(customerController.getAllCustomers)
+  .get(
+    authController.protect,
+    authController.restrictTo('worker'),
+    customerController.getAllCustomers,
+  )
   .post(customerController.createCustomer);
 
 router

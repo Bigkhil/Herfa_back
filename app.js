@@ -12,6 +12,7 @@ const customerRouter = require('./routes/customerRoutes');
 const workerRouter = require('./routes/workerRoutes');
 const authRouter = require('./routes/authRoutes');
 const reviewRouter = require('./routes/reviewRoutes');
+const orderRouter = require('./routes/orderRoutes');
 
 const app = express();
 
@@ -69,6 +70,7 @@ app.use('/api/v1/customers', customerRouter);
 app.use('/api/v1/workers', workerRouter);
 app.use('/api/v1/auth', authRouter);
 app.use('/api/v1/reviews', reviewRouter);
+app.use('/api/v1/orders', orderRouter);
 
 app.all('*', (req, res, next) => {
   // res.status(404).json({

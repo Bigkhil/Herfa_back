@@ -1,6 +1,7 @@
 const express = require('express');
 const authController = require('../controllers/authController');
 const workerController = require('../controllers/workerController');
+const orderRouter = require('./orderRoutes');
 const reviewRouter = require('./reviewRoutes');
 
 const router = express.Router();
@@ -13,6 +14,7 @@ router.route('/signup').post(authController.signup);
 // GET /workers/234fad4/reviews/56fd12s
 
 router.use('/:workerId/reviews', reviewRouter);
+router.use('/:workerId/orders', orderRouter);
 
 router
   .route('/')

@@ -328,14 +328,31 @@ exports.updateMe = catchAsync(async (req, res, next) => {
       ),
     );
   }
-  // 2) Filter out unwanted fields names that are not allowed
-  const filteredBody = filterObj(req.body, 'name', 'email');
 
-  // 3) Update user document
-  const updatedUser = await User.findByIdAndUpdate(req.user.id, filteredBody, {
-    new: true,
-    runValidators: true,
-  });
+  // 2) Determine whether the user is a customer or worker and filter allowed fields
+  let filteredBody;
+  let updatedUser;
+
+  if (req.user.role === 'customer') {
+    filteredBody = filterObj(req.body, 'name', 'email'); // Add more fields if necessary
+    updatedUser = await Customer.findByIdAndUpdate(req.user.id, filteredBody, {
+      new: true,
+      runValidators: true,
+    });
+  } else if (req.user.role === 'worker') {
+    filteredBody = filterObj(req.body, 'name', 'email', 'skill', 'hourlyRate'); // Add more fields if necessary
+    updatedUser = await Worker.findByIdAndUpdate(req.user.id, filteredBody, {
+      new: true,
+      runValidators: true,
+    });
+  } else {
+    return next(new AppError('User role is not recognized.', 400));
+  }
+
+  // 3) If the user is not found
+  if (!updatedUser) {
+    return next(new AppError('No user found with that ID', 404));
+  }
 
   res.status(200).json({
     status: 'success',

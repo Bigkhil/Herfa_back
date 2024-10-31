@@ -20,7 +20,7 @@ router.get('/me', authController.getMe, (req, res, next) => {
   }
 });
 router.patch('/updateMe', authController.updateMe);
-// router.delete('/deleteMe', userController.deleteMe);
 // router.patch('/updateMyPassword', authController.updatePassword);
+// router.delete('/deleteMe', userController.deleteMe);
 
 module.exports = router;
