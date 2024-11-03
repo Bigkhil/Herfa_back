@@ -2,6 +2,7 @@ const express = require('express');
 const morgan = require('morgan');
 const rateLimit = require('express-rate-limit');
 const helmet = require('helmet');
+const path = require('path');
 const mongoSanitize = require('express-mongo-sanitize');
 const xss = require('xss-clean');
 const hpp = require('hpp');
@@ -19,6 +20,11 @@ const app = express();
 //1) GLOBAL MIDDLEWARES
 // i want to add puplic as my html & css landing page in my server
 app.use(express.static(path.join(__dirname, 'public')));
+
+// Route to serve the HTML page
+app.get('/', (req, res) => {
+  res.sendFile(path.join(__dirname, 'public', 'index.html'));
+});
 
 //Set Security - HTTP Headers
 app.use(helmet());
