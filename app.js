@@ -17,6 +17,8 @@ const orderRouter = require('./routes/orderRoutes');
 const app = express();
 
 //1) GLOBAL MIDDLEWARES
+// i want to add puplic as my html & css landing page in my server
+app.use(express.static(path.join(__dirname, 'public')));
 
 //Set Security - HTTP Headers
 app.use(helmet());
