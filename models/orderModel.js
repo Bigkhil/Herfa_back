@@ -39,7 +39,7 @@ const orderSchema = new mongoose.Schema(
     toObject: { virtuals: true },
   },
 );
-orderSchema.index({ worker: 1, customer: 1 }, { unique: true });
+// orderSchema.index({ worker: 1, customer: 1 }, { unique: true });
 
 // Middleware to update the updatedAt field
 orderSchema.pre('save', function (next) {

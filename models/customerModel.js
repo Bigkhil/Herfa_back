@@ -32,6 +32,7 @@ const customerSchema = new mongoose.Schema({
   },
   city: {
     type: String,
+    trim:true,
     required: true,
   },
   password: {

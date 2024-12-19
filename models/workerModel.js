@@ -28,6 +28,7 @@ const workerSchema = new mongoose.Schema(
     },
     phoneNumber: {
       type: String,
+      trim:true,
       required: true,
       unique: true,
     },
