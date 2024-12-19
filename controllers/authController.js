@@ -335,13 +335,23 @@ exports.updateMe = catchAsync(async (req, res, next) => {
   let updatedUser;
 
   if (req.user.role === 'customer') {
-    filteredBody = filterObj(req.body, 'name', 'email'); // Add more fields if necessary
+    filteredBody = filterObj(req.body, 'name', 'email', 'city', 'phoneNumber','image'); // Add more fields if necessary
     updatedUser = await Customer.findByIdAndUpdate(req.user.id, filteredBody, {
       new: true,
       runValidators: true,
     });
   } else if (req.user.role === 'worker') {
-    filteredBody = filterObj(req.body, 'name', 'email', 'skill', 'hourlyRate'); // Add more fields if necessary
+    filteredBody = filterObj(
+      req.body,
+      'name',
+      'email',
+      'skill',
+      'city',
+      'image',
+      'hourlyRate',
+      'yearsOfExperience',
+      'bio',
+    ); // Add more fields if necessary
     updatedUser = await Worker.findByIdAndUpdate(req.user.id, filteredBody, {
       new: true,
       runValidators: true,
@@ -364,7 +374,6 @@ exports.updateMe = catchAsync(async (req, res, next) => {
 });
 
 exports.updatePassword = catchAsync(async (req, res, next) => {
-
   let user;
   if (req.user.role === 'worker') {
     user = await Worker.findById(req.user.id).select('+password');
