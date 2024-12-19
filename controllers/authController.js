@@ -58,6 +58,7 @@ exports.signup = catchAsync(async (req, res, next) => {
     ratingsQuantity,
     city,
     role,
+    image,
     skill, // New field for worker
     yearsOfExperience, // New field for worker
     hourlyRate, // New field for worker
@@ -360,4 +361,27 @@ exports.updateMe = catchAsync(async (req, res, next) => {
       user: updatedUser,
     },
   });
+});
+
+exports.updatePassword = catchAsync(async (req, res, next) => {
+
+  let user;
+  if (req.user.role === 'worker') {
+    user = await Worker.findById(req.user.id).select('+password');
+  } else {
+    user = await Customer.findById(req.user.id).select('+password');
+  }
+
+  // 2) Check if POSTed current password is correct
+  if (!(await user.correctPassword(req.body.passwordCurrent, user.password))) {
+    return next(new AppError('Your current password is wrong.', 401));
+  }
+
+  // 3) If so, update password
+  user.password = req.body.password;
+  user.passwordConfirm = req.body.passwordConfirm;
+  await user.save();
+
+  // 4) Log user in, send JWT
+  createSendToken(user, 200, res);
 });

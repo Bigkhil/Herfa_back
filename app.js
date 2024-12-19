@@ -6,6 +6,7 @@ const path = require('path');
 const mongoSanitize = require('express-mongo-sanitize');
 const xss = require('xss-clean');
 const hpp = require('hpp');
+const cors = require('cors');
 
 const AppError = require('./utils/appError');
 const globalErrorhandler = require('./controllers/errorController');
@@ -21,10 +22,16 @@ const app = express();
 // i want to add puplic as my html & css landing page in my server
 app.use(express.static(path.join(__dirname, 'public')));
 
-// Route to serve the HTML page
-app.get('/', (req, res) => {
-  res.sendFile(path.join(__dirname, 'public', 'index.html'));
-});
+app.use(
+  cors({
+    origin: 'http://localhost:5173/', // Allow your front-end origin
+    methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'], // Allow specific methods
+    allowedHeaders: ['Content-Type', 'Authorization'], // Allow headers
+  }),
+);
+
+app.set('view engine', 'pug');
+app.set('views', path.join(__dirname, 'views'));
 
 //Set Security - HTTP Headers
 app.use(helmet());
@@ -74,6 +81,13 @@ app.use((req, res, next) => {
 });
 
 //3) Routes
+app.get('/', (req, res) => {
+  res.status(200).render('base', {
+    title: 'My Landing Page',
+    message: 'Welcome to the best Express app!',
+  });
+});
+
 app.use('/api/v1/customers', customerRouter);
 app.use('/api/v1/workers', workerRouter);
 app.use('/api/v1/auth', authRouter);

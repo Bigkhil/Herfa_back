@@ -22,6 +22,10 @@ const workerSchema = new mongoose.Schema(
       enum: ['customer', 'worker', 'admin'], // Added 'admin' here
       default: 'worker', // Default role for workers
     },
+    image: { 
+      type:String,
+      default:'default.png'
+    },
     phoneNumber: {
       type: String,
       required: true,

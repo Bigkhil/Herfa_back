@@ -18,7 +18,7 @@ router.use('/:workerId/orders', orderRouter);
 
 router
   .route('/')
-  .get(workerController.getAllWorkers)
+  .get(authController.protect,workerController.getAllWorkers)
   .post(workerController.createWorker);
 
 router
