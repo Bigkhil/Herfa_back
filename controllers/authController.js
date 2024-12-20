@@ -320,22 +320,67 @@ exports.getCustomerMe = catchAsync(async (req, res, next) => {
 });
 
 exports.updateMe = catchAsync(async (req, res, next) => {
-  // 1) Create error if user POSTs passwords data
+  // 1) Create error if user POSTs password data
   if (req.body.password || req.body.passwordConfirm) {
     return next(
       new AppError(
-        'This route is not for password updates. Please use /updateMypassword',
-        400,
+        'This route is not for password updates. Please use /updateMyPassword',
+        400
       ),
     );
   }
 
-  // 2) Determine whether the user is a customer or worker and filter allowed fields
+  // 2) Check if email or phone number already exists (if being updated)
+  if (req.body.email || req.body.phoneNumber) {
+    let existingUser;
+
+    if (req.body.email) {
+      // Check if email exists in either collection (excluding current user)
+      existingUser = await Customer.findOne({ 
+        email: req.body.email, 
+        _id: { $ne: req.user.id } 
+      });
+      if (!existingUser) {
+        existingUser = await Worker.findOne({ 
+          email: req.body.email, 
+          _id: { $ne: req.user.id } 
+        });
+      }
+      if (existingUser) {
+        return next(new AppError('Email already exists. Please use a different email.', 400));
+      }
+    }
+
+    if (req.body.phoneNumber) {
+      // Check if phone number exists in either collection (excluding current user)
+      existingUser = await Customer.findOne({ 
+        phoneNumber: req.body.phoneNumber, 
+        _id: { $ne: req.user.id } 
+      });
+      if (!existingUser) {
+        existingUser = await Worker.findOne({ 
+          phoneNumber: req.body.phoneNumber, 
+          _id: { $ne: req.user.id } 
+        });
+      }
+      if (existingUser) {
+        return next(new AppError('Phone number already exists. Please use a different number.', 400));
+      }
+    }
+  }
+
+  // 3) Filter allowed fields based on user role
   let filteredBody;
   let updatedUser;
 
   if (req.user.role === 'customer') {
-    filteredBody = filterObj(req.body, 'name', 'email', 'city', 'phoneNumber','image'); // Add more fields if necessary
+    filteredBody = filterObj(
+      req.body, 
+      'name', 
+      'email', 
+      'city', 
+      'phoneNumber',
+    );
     updatedUser = await Customer.findByIdAndUpdate(req.user.id, filteredBody, {
       new: true,
       runValidators: true,
@@ -347,11 +392,11 @@ exports.updateMe = catchAsync(async (req, res, next) => {
       'email',
       'skill',
       'city',
-      'image',
+      'phoneNumber',
       'hourlyRate',
       'yearsOfExperience',
-      'bio',
-    ); // Add more fields if necessary
+      'bio'
+    );
     updatedUser = await Worker.findByIdAndUpdate(req.user.id, filteredBody, {
       new: true,
       runValidators: true,
@@ -360,7 +405,7 @@ exports.updateMe = catchAsync(async (req, res, next) => {
     return next(new AppError('User role is not recognized.', 400));
   }
 
-  // 3) If the user is not found
+  // 4) If the user is not found
   if (!updatedUser) {
     return next(new AppError('No user found with that ID', 404));
   }
