@@ -24,8 +24,8 @@ app.use(express.static(path.join(__dirname, 'public')));
 
 app.use(
   cors({
-    origin: 'http://localhost:5173/', // Allow your front-end origin
-    methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'], // Allow specific methods
+    origin: 'http://localhost:5173', // Allow your front-end origin
+    methods: ['GET', 'POST', 'PATCH', 'DELETE', 'OPTIONS'], // Allow specific methods
     allowedHeaders: ['Content-Type', 'Authorization'], // Allow headers
   }),
 );
