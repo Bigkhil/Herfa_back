@@ -374,13 +374,7 @@ exports.updateMe = catchAsync(async (req, res, next) => {
   let updatedUser;
 
   if (req.user.role === 'customer') {
-    filteredBody = filterObj(
-      req.body, 
-      'name', 
-      'email', 
-      'city', 
-      'phoneNumber',
-    );
+    filteredBody = filterObj(req.body, 'name', 'email', 'city', 'phoneNumber','image'); // Add more fields if necessary
     updatedUser = await Customer.findByIdAndUpdate(req.user.id, filteredBody, {
       new: true,
       runValidators: true,
@@ -391,8 +385,9 @@ exports.updateMe = catchAsync(async (req, res, next) => {
       'name',
       'email',
       'skill',
-      'city',
       'phoneNumber',
+      'city',
+      'image',
       'hourlyRate',
       'yearsOfExperience',
       'bio'
