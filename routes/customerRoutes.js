@@ -16,4 +16,12 @@ router
   .get(customerController.getCustomer)
   .delete(customerController.deleteCustomer);
 
+router.use(authController.protect);
+
+router.post(
+  '/update-profile-photo',
+  authController.uploadProfilePhoto,
+  authController.updateProfilePhoto,
+);
+
 module.exports = router;
