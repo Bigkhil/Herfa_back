@@ -15,7 +15,7 @@ exports.getAllReviews = catchAsync(async (req, res, next) => {
   if (req.params.workerId) filter = { worker: req.params.workerId };
   console.log(filter);
 
-  const reviews = await Review.find(filter).populate('customer', 'name city');
+  const reviews = await Review.find(filter).populate('customer', 'name city image');
 
   res.status(200).json({
     status: 'success',
