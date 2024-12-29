@@ -21,7 +21,6 @@ router.get('/me', authController.getMe, (req, res, next) => {
 });
 router.patch('/updateMe', authController.updateMe);
 router.patch('/updateMyPassword', authController.updatePassword);
-// router.patch('/updateProfilePicture', authController.protect, authController.addImage);
 // router.delete('/deleteMe', userController.deleteMe);
 
 module.exports = router;

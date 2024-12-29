@@ -434,3 +434,38 @@ exports.updatePassword = catchAsync(async (req, res, next) => {
   // 4) Log user in, send JWT
   createSendToken(user, 200, res);
 });
+
+const upload = require('../utils/upload');
+
+// Middleware for file upload
+exports.uploadProfilePhoto = upload.single('photo');
+
+exports.updateProfilePhoto = catchAsync(async (req, res, next) => {
+  if (!req.file) {
+    return next(new AppError('No file uploaded!', 400));
+  }
+  console.log(req.user.id);
+  let current_user;
+  if (req.user.role === 'customer'){
+    current_user = await Customer.findByIdAndUpdate(
+      req.user.id,
+      { image: req.file.filename },
+      { new: true, runValidators: true },
+    );
+  }
+  else{
+    current_user = await Worker.findByIdAndUpdate(
+      req.user.id,
+      {image: req.file.filename},
+      { new: true, runValidators: true },
+    )
+  }
+
+
+  res.status(200).json({
+    status: 'success',
+    data: {
+      updated_user: current_user,
+    },
+  });
+});

@@ -26,4 +26,12 @@ router
   .get(workerController.getWorker)
   .delete(workerController.deleteWorker);
 
+router.use(authController.protect);
+
+router.post(
+  '/update-profile-photo',
+  authController.uploadProfilePhoto,
+  authController.updateProfilePhoto,
+);
+
 module.exports = router;
