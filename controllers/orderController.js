@@ -16,7 +16,9 @@ exports.getAllOrders = catchAsync(async (req, res, next) => {
     filter.customer = req.user.id;
   }
 
-  const orders = await Order.find(filter);
+  const orders = await Order.find(filter)
+    .populate('customer', 'name')
+    .populate('worker', 'name');
 
   res.status(200).json({
     status: 'success',
@@ -73,7 +75,7 @@ exports.getOrder = catchAsync(async (req, res, next) => {
 exports.updateOrder = catchAsync(async (req, res, next) => {
   // 1) Find the order
   const order = await Order.findById(req.params.id);
-  
+
   if (!order) {
     return next(new AppError('No order found with that ID', 404));
   }
@@ -83,7 +85,9 @@ exports.updateOrder = catchAsync(async (req, res, next) => {
   const isWorker = order.worker.toString() === req.user.id;
 
   if (!isCustomer && !isWorker) {
-    return next(new AppError('You are not authorized to update this order', 403));
+    return next(
+      new AppError('You are not authorized to update this order', 403),
+    );
   }
 
   // 3) Validate status updates based on user role and current status
@@ -102,14 +106,16 @@ exports.updateOrder = catchAsync(async (req, res, next) => {
     if (isWorker) {
       const allowedStatusUpdates = {
         pending: ['in progress'],
-        'in progress': ['completed']
+        'in progress': ['completed'],
       };
 
       if (!allowedStatusUpdates[order.status]?.includes(req.body.status)) {
-        return next(new AppError(
-          `Cannot update status from '${order.status}' to '${req.body.status}'`, 
-          400
-        ));
+        return next(
+          new AppError(
+            `Cannot update status from '${order.status}' to '${req.body.status}'`,
+            400,
+          ),
+        );
       }
     }
   }
@@ -119,27 +125,23 @@ exports.updateOrder = catchAsync(async (req, res, next) => {
   const updates = filterObj(req.body, ...allowedUpdates);
 
   // 5) Update the order
-  const updatedOrder = await Order.findByIdAndUpdate(
-    req.params.id,
-    updates,
-    {
-      new: true,
-      runValidators: true
-    }
-  );
+  const updatedOrder = await Order.findByIdAndUpdate(req.params.id, updates, {
+    new: true,
+    runValidators: true,
+  });
 
   res.status(200).json({
     status: 'success',
     data: {
-      order: updatedOrder
-    }
+      order: updatedOrder,
+    },
   });
 });
 
 // Helper function to filter allowed fields
 const filterObj = (obj, ...allowedFields) => {
   const newObj = {};
-  Object.keys(obj).forEach(el => {
+  Object.keys(obj).forEach((el) => {
     if (allowedFields.includes(el)) {
       newObj[el] = obj[el];
     }
