@@ -31,6 +31,7 @@ app.use(
 );
 
 app.use('/uploads', express.static(path.join(__dirname, 'public/uploads')));
+console.log(__dirname);
 
 app.set('view engine', 'pug');
 app.set('views', path.join(__dirname, 'views'));
