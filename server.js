@@ -35,7 +35,7 @@ mongoose
 // server
 
 const port = process.env.PORT || 3000;
-const server = app.listen(port, () => {
+const server = https.createServer(sslOptions, app).listen(443, () => {
   console.log(`App running on port ${port}...`);
 });
 

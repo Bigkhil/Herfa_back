@@ -208,9 +208,7 @@ exports.forgotPassword = catchAsync(async (req, res, next) => {
   await user.save({ validateBeforeSave: false });
 
   // 3) Send it to user's email
-  const resetURL = `${req.protocol}://${req.get(
-    'host',
-  )}/api/v1/auth/resetPassword/${resetToken}`;
+  const resetURL = `${req.protocol}://callmekhiloo.tech/api/v1/auth/resetPassword/${resetToken}`;
 
   const message = `Forgot your password? Click on this link to reset your password: ${resetURL}.\nIf you didn't forget your password, please ignore this email!`;
 

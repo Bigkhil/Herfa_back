@@ -7,6 +7,8 @@ const mongoSanitize = require('express-mongo-sanitize');
 const xss = require('xss-clean');
 const hpp = require('hpp');
 const cors = require('cors');
+const https = require('https');
+const fs = require('fs');
 
 const AppError = require('./utils/appError');
 const globalErrorhandler = require('./controllers/errorController');
@@ -17,6 +19,11 @@ const reviewRouter = require('./routes/reviewRoutes');
 const orderRouter = require('./routes/orderRoutes');
 
 const app = express();
+
+const sslOptions = {
+  key: fs.readFileSync('/etc/letsencrypt/live/callmekhiloo.tech/privkey.pem'),
+  cert: fs.readFileSync('/etc/letsencrypt/live/callmekhiloo.tech/fullchain.pem'),
+};
 
 //1) GLOBAL MIDDLEWARES
 // i want to add puplic as my html & css landing page in my server
