@@ -1,5 +1,7 @@
 const mongoose = require('mongoose');
 const dotenv = require('dotenv');
+const fs = require('fs');
+const https = require('https');
 
 process.on('uncaughtException', (err) => {
   // listting to event
@@ -19,6 +21,11 @@ const DB = process.env.DATABASE.replace(
   '<PASSWORD>',
   process.env.DATABASE_PASSWORD,
 );
+
+const sslOptions = {
+  key: fs.readFileSync('/etc/letsencrypt/live/callmekhiloo.tech/privkey.pem'),
+  cert: fs.readFileSync('/etc/letsencrypt/live/callmekhiloo.tech/fullchain.pem'),
+};
 
 mongoose
   .connect(DB, {
