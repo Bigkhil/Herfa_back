@@ -31,7 +31,7 @@ app.use(express.static(path.join(__dirname, 'public')));
 
 app.use(
   cors({
-    origin: 'http://localhost:5173', // Allow your front-end origin
+    origin: '*', // Allow your front-end origin
     methods: ['GET', 'POST', 'PATCH', 'DELETE', 'OPTIONS'], // Allow specific methods
     allowedHeaders: ['Content-Type', 'Authorization'], // Allow headers
   }),
@@ -52,13 +52,13 @@ if (process.env.NODE_ENV === 'development') {
 }
 
 // Limit request from same IP
-const limiter = rateLimit({
-  max: 100,
-  windowMs: 60 * 60 * 1000, // 1 hour
-  message: 'Too many requests from this IP, Please try again in an hour!',
-});
+//const limiter = rateLimit({
+//  max: 500,
+//  windowMs: 60 * 60 * 1000, // 1 hour
+//  message: 'Too many requests from this IP, Please try again in an hour!',
+//});
 
-app.use('/api', limiter);
+//app.use('/api', limiter);
 
 //Body parser, reading data from body into req.body
 app.use(express.json({ limit: '10kb' })); // middleware
