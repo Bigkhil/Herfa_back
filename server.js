@@ -1,7 +1,5 @@
 const mongoose = require('mongoose');
 const dotenv = require('dotenv');
-const fs = require('fs');
-const https = require('https');
 
 process.on('uncaughtException', (err) => {
   // listting to event
@@ -22,11 +20,6 @@ const DB = process.env.DATABASE.replace(
   process.env.DATABASE_PASSWORD,
 );
 
-const sslOptions = {
-  key: fs.readFileSync('/etc/letsencrypt/live/callmekhiloo.tech/privkey.pem'),
-  cert: fs.readFileSync('/etc/letsencrypt/live/callmekhiloo.tech/fullchain.pem'),
-};
-
 mongoose
   .connect(DB, {
     // return a promise
@@ -42,8 +35,8 @@ mongoose
 // server
 
 const port = process.env.PORT || 3000;
-const server = https.createServer(sslOptions, app).listen(443, () => {
-  console.log(`App running on port ${port}...`);
+const server = app.listen(portnumber, () => {
+  console.log(`listening on port ${portnumber}`);
 });
 
 process.on('unhandledRejection', (err) => {
