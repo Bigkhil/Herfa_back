@@ -34,7 +34,7 @@ mongoose
 
 // server
 
-const port = process.env.PORT || 3000;
+const portnumber = process.env.PORT || 3000;
 const server = app.listen(portnumber, () => {
   console.log(`listening on port ${portnumber}`);
 });
