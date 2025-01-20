@@ -208,7 +208,7 @@ exports.forgotPassword = catchAsync(async (req, res, next) => {
   await user.save({ validateBeforeSave: false });
 
   // 3) Send it to user's email
-  const resetURL = `${req.protocol}://callmekhiloo.tech/api/v1/auth/resetPassword/${resetToken}`;
+  const resetURL = `${req.protocol}://callmekhiloo.tech/resetPassword/${resetToken}`;
 
   const message = `Forgot your password? Click on this link to reset your password: ${resetURL}.\nIf you didn't forget your password, please ignore this email!`;
 
@@ -323,7 +323,7 @@ exports.updateMe = catchAsync(async (req, res, next) => {
     return next(
       new AppError(
         'This route is not for password updates. Please use /updateMyPassword',
-        400
+        400,
       ),
     );
   }
@@ -334,35 +334,45 @@ exports.updateMe = catchAsync(async (req, res, next) => {
 
     if (req.body.email) {
       // Check if email exists in either collection (excluding current user)
-      existingUser = await Customer.findOne({ 
-        email: req.body.email, 
-        _id: { $ne: req.user.id } 
+      existingUser = await Customer.findOne({
+        email: req.body.email,
+        _id: { $ne: req.user.id },
       });
       if (!existingUser) {
-        existingUser = await Worker.findOne({ 
-          email: req.body.email, 
-          _id: { $ne: req.user.id } 
+        existingUser = await Worker.findOne({
+          email: req.body.email,
+          _id: { $ne: req.user.id },
         });
       }
       if (existingUser) {
-        return next(new AppError('Email already exists. Please use a different email.', 400));
+        return next(
+          new AppError(
+            'Email already exists. Please use a different email.',
+            400,
+          ),
+        );
       }
     }
 
     if (req.body.phoneNumber) {
       // Check if phone number exists in either collection (excluding current user)
-      existingUser = await Customer.findOne({ 
-        phoneNumber: req.body.phoneNumber, 
-        _id: { $ne: req.user.id } 
+      existingUser = await Customer.findOne({
+        phoneNumber: req.body.phoneNumber,
+        _id: { $ne: req.user.id },
       });
       if (!existingUser) {
-        existingUser = await Worker.findOne({ 
-          phoneNumber: req.body.phoneNumber, 
-          _id: { $ne: req.user.id } 
+        existingUser = await Worker.findOne({
+          phoneNumber: req.body.phoneNumber,
+          _id: { $ne: req.user.id },
         });
       }
       if (existingUser) {
-        return next(new AppError('Phone number already exists. Please use a different number.', 400));
+        return next(
+          new AppError(
+            'Phone number already exists. Please use a different number.',
+            400,
+          ),
+        );
       }
     }
   }
@@ -372,7 +382,14 @@ exports.updateMe = catchAsync(async (req, res, next) => {
   let updatedUser;
 
   if (req.user.role === 'customer') {
-    filteredBody = filterObj(req.body, 'name', 'email', 'city', 'phoneNumber','image'); // Add more fields if necessary
+    filteredBody = filterObj(
+      req.body,
+      'name',
+      'email',
+      'city',
+      'phoneNumber',
+      'image',
+    ); // Add more fields if necessary
     updatedUser = await Customer.findByIdAndUpdate(req.user.id, filteredBody, {
       new: true,
       runValidators: true,
@@ -388,7 +405,7 @@ exports.updateMe = catchAsync(async (req, res, next) => {
       'image',
       'hourlyRate',
       'yearsOfExperience',
-      'bio'
+      'bio',
     );
     updatedUser = await Worker.findByIdAndUpdate(req.user.id, filteredBody, {
       new: true,
@@ -444,21 +461,19 @@ exports.updateProfilePhoto = catchAsync(async (req, res, next) => {
   }
   console.log(req.user.id);
   let current_user;
-  if (req.user.role === 'customer'){
+  if (req.user.role === 'customer') {
     current_user = await Customer.findByIdAndUpdate(
       req.user.id,
       { image: req.file.filename },
       { new: true, runValidators: true },
     );
-  }
-  else{
+  } else {
     current_user = await Worker.findByIdAndUpdate(
       req.user.id,
-      {image: req.file.filename},
+      { image: req.file.filename },
       { new: true, runValidators: true },
-    )
+    );
   }
-
 
   res.status(200).json({
     status: 'success',
